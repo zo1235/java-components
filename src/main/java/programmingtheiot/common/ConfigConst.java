@@ -171,11 +171,12 @@ public class ConfigConst
 	 * Configuration Sections, Keys and Defaults
 	 */
 	
-	public static final String DEFAULT_CONFIG_FILE_NAME      = "./config/PiotConfig.props";
-	public static final String DEFAULT_CRED_FILE_NAME        = "./cred/PiotCred.props";
-	public static final String DEFAULT_KEY_STORE_FILE_NAME   = "./cred/KeyStore.jks";
-	public static final String DEFAULT_TRUST_STORE_FILE_NAME = "./cred/TrustStore.jks";
-	public static final String DEFAULT_CERT_FILE_NAME        = "./cert/PiotCert.pem";
+	public static final String DEFAULT_CONFIG_FILE_NAME = "/home/zohera/programmingtheiot/java-components/config/PiotConfig.props";
+	public static final String DEFAULT_CRED_FILE_NAME = "/home/zohera/cred/PiotCred.props";
+	public static final String DEFAULT_KEY_STORE_FILE_NAME = "/home/zohera/cred/KeyStore.jks";
+	public static final String DEFAULT_TRUST_STORE_FILE_NAME = "/home/zohera/cred/TrustStore.jks";
+	public static final String DEFAULT_CERT_FILE_NAME = "/home/zohera/cert/PiotCert.pem";
+
 	
 	public static final int DEFAULT_QOS = 0;
 	

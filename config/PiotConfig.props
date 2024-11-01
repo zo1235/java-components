@@ -46,8 +46,8 @@ port           = 1883
 securePort     = 8883
 defaultQoS     = 0
 keepAlive      = 60
-enableAuth     = False
-enableCrypt    = False
+enableAuth     = True
+enableCrypt    = True
 useAsyncClient = False
 
 #
@@ -59,8 +59,8 @@ certFile       = ./cert/PiotCoapLocalCertFile.pem
 host           = localhost
 port           = 5683
 securePort     = 5684
-enableAuth     = False
-enableCrypt    = False
+enableAuth     = True
+enableCrypt    = True
 enableConfirmedMsgs = True
 
 #
@@ -71,12 +71,12 @@ deviceLocationID        = gatewaydevice001
 enableLogging           = True
 pollCycleSecs           = 60
 enableMqttClient        = True
-enableCoapServer        = False
-enableCoapClient        = False
-enableCloudClient       = False
-enableSmtpClient        = False
-enablePersistenceClient = False
-enableSystemPerformance = False
+enableCoapServer        = True
+enableCoapClient        = True
+enableCloudClient       = True
+enableSmtpClient        = True
+enablePersistenceClient = True
+enableSystemPerformance = True
 testGdaDataPath         = /tmp/gda-data
 testCdaDataPath         = /tmp/cda-data
-testEmptyApp            = False
+testEmptyApp            = True

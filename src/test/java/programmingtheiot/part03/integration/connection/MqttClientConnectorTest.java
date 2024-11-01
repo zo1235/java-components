@@ -41,13 +41,11 @@ public class MqttClientConnectorTest
 	private static final Logger _Logger =
 		Logger.getLogger(MqttClientConnectorTest.class.getName());
 	
-	
 	// member var's
 	
 	// TODO: make sure MqttClientConnector is configured to
 	// use the synchronous MqttClient
 	private MqttClientConnector mqttClient = null;
-	
 	
 	// test setup methods
 	
@@ -73,7 +71,7 @@ public class MqttClientConnectorTest
 	/**
 	 * Test method for {@link programmingtheiot.gda.connection.MqttClientConnector#connectClient()}.
 	 */
-//	@Test
+	//@Test
 	public void testConnectAndDisconnect()
 	{
 		int delay = ConfigUtil.getInstance().getInteger(ConfigConst.MQTT_GATEWAY_SERVICE, ConfigConst.KEEP_ALIVE_KEY, ConfigConst.DEFAULT_KEEP_ALIVE);
@@ -145,7 +143,7 @@ public class MqttClientConnectorTest
 	/**
 	 * Test method for {@link programmingtheiot.gda.connection.MqttClientConnector#publishMessage(programmingtheiot.common.ResourceNameEnum, java.lang.String, int)}.
 	 */
-//	@Test
+//	//@Test
 	public void testPublishAndSubscribeTwoClients()
 	{
 		int qos = 0;
@@ -190,7 +188,7 @@ public class MqttClientConnectorTest
 	/**
 	 * Test method for {@link programmingtheiot.gda.connection.MqttClientConnector#publishMessage(programmingtheiot.common.ResourceNameEnum, java.lang.String, int)}.
 	 */
-//	@Test
+//	//@Test
 	public void testIntegrateWithCdaPublishCdaCmdTopic()
 	{
 		int qos = 1;

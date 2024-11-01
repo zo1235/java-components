@@ -1,101 +1,73 @@
-/**
- * This class is part of the Programming the Internet of Things project.
- * 
- * It is provided as a simple shell to guide the student and assist with
- * implementation for the Programming the Internet of Things exercises,
- * and designed to be modified by the student as needed.
- */ 
-
 package programmingtheiot.data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import programmingtheiot.common.ConfigConst;
 
-/**
- * Convenience wrapper to store system state data, including location
- * information, action command, state data and a list of the following
- * data items:
- * <p>SystemPerformanceData
- * <p>SensorData
- * 
- */
 public class SystemStateData extends BaseIotData implements Serializable
 {
-	// static
+	// private variables
+	private int command = ConfigConst.DEFAULT_COMMAND;
+	private List<SystemPerformanceData> sysPerfDataList = new ArrayList<>();
+	private List<SensorData> sensorDataList = new ArrayList<>();
 	
-	
-	// private var's
-	
-    
-    
 	// constructors
-	
 	public SystemStateData()
 	{
 		super();
 	}
-	
-	
+
 	// public methods
-	
 	public boolean addSensorData(SensorData data)
 	{
-		return false;
+		return this.sensorDataList.add(data);
 	}
 	
 	public boolean addSystemPerformanceData(SystemPerformanceData data)
 	{
-		return false;
+		return this.sysPerfDataList.add(data);
 	}
 	
 	public int getCommand()
 	{
-		return 0;
+		return this.command;
 	}
 	
 	public List<SensorData> getSensorDataList()
 	{
-		return null;
+		return this.sensorDataList;
 	}
 	
 	public List<SystemPerformanceData> getSystemPerformanceDataList()
 	{
-		return null;
+		return this.sysPerfDataList;
 	}
 	
 	public void setCommand(int actionCmd)
 	{
+		this.command = actionCmd;
 	}
 	
-	/**
-	 * Returns a string representation of this instance. This will invoke the base class
-	 * {@link #toString()} method, then append the output from this call.
-	 * 
-	 * @return String The string representing this instance, returned in CSV 'key=value' format.
-	 */
+	// protected methods
+	protected void handleUpdateData(BaseIotData data)
+	{
+		if (data instanceof SystemStateData) {
+			SystemStateData sysData = (SystemStateData) data;
+			this.setCommand(sysData.getCommand());
+			this.sysPerfDataList.addAll(sysData.getSystemPerformanceDataList());
+			this.sensorDataList.addAll(sysData.getSensorDataList());
+		}
+	}
+	
+	// toString method
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder(super.toString());
-		
 		sb.append(',');
 		sb.append(ConfigConst.COMMAND_PROP).append('=').append(this.getCommand()).append(',');
 		sb.append(ConfigConst.SENSOR_DATA_LIST_PROP).append('=').append(this.getSensorDataList()).append(',');
 		sb.append(ConfigConst.SYSTEM_PERF_DATA_LIST_PROP).append('=').append(this.getSystemPerformanceDataList());
-		
 		return sb.toString();
 	}
-	
-	
-	// protected methods
-	
-	/* (non-Javadoc)
-	 * @see programmingtheiot.data.BaseIotData#handleUpdateData(programmingtheiot.data.BaseIotData)
-	 */
-	protected void handleUpdateData(BaseIotData data)
-	{
-	}
-	
 }
