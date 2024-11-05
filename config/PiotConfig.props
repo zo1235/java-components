@@ -48,7 +48,7 @@ defaultQoS     = 0
 keepAlive      = 60
 enableAuth     = True
 enableCrypt    = True
-useAsyncClient = False
+useAsyncClient = True
 
 #
 # CoAP client and server configuration information
@@ -59,9 +59,9 @@ certFile       = ./cert/PiotCoapLocalCertFile.pem
 host           = localhost
 port           = 5683
 securePort     = 5684
-enableAuth     = True
-enableCrypt    = True
-enableConfirmedMsgs = True
+enableAuth     = False
+enableCrypt    = False
+enableConfirmedMsgs = False
 
 #
 # GDA specific configuration information

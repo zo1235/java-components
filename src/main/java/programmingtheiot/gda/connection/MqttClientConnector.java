@@ -97,6 +97,7 @@ public class MqttClientConnector implements IPubSubClient, MqttCallbackExtended
 		this.brokerAddr = this.protocol + "://" + this.host + ":" + this.port;
 	}
 
+	
 	// public methods
 	@Override
 	public boolean connectClient()
@@ -138,11 +139,7 @@ public class MqttClientConnector implements IPubSubClient, MqttCallbackExtended
 			_Logger.log(Level.SEVERE, "Failed to disconnect MQTT client from broker: " + this.brokerAddr, e);
 		}
 		return false;
-	}
-
-	public boolean isConnected() 	{ 	... by Wajid Hussain
-Wajid Hussain
-8:14 PM
+	}	
 
 	public boolean isConnected()
 	{
@@ -244,7 +241,6 @@ Wajid Hussain
 	{
 		// TODO: Logging level may need to be adjusted to see output in log file / console
 		_Logger.info("Delivered MQTT message with ID: " + token.getMessageId());
- 
 	}
 	@Override
 	public void messageArrived(String topic, MqttMessage msg) throws Exception
