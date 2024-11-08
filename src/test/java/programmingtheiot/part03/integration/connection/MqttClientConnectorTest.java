@@ -20,7 +20,6 @@ import programmingtheiot.common.ConfigUtil;
 import programmingtheiot.common.IDataMessageListener;
 import programmingtheiot.common.ResourceNameEnum;
 import programmingtheiot.gda.connection.MqttClientConnector;
-import programmingtheiot.gda.connection.MqttPublishDataMessageListener;
 
 public class MqttClientConnectorTest {
 

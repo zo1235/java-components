@@ -48,7 +48,7 @@ defaultQoS     = 0
 keepAlive      = 60
 enableAuth     = True
 enableCrypt    = True
-useAsyncClient = True
+useAsyncClient = False
 
 #
 # CoAP client and server configuration information
@@ -75,8 +75,8 @@ enableCoapServer        = True
 enableCoapClient        = True
 enableCloudClient       = True
 enableSmtpClient        = True
-enablePersistenceClient = True
-enableSystemPerformance = True
+enablePersistenceClient = False
+enableSystemPerformance = False
 testGdaDataPath         = /tmp/gda-data
 testCdaDataPath         = /tmp/cda-data
 testEmptyApp            = True

@@ -64,6 +64,7 @@ public class DeviceDataManager implements IDataMessageListener {
         }
 
         if (this.enableMqttClient) {
+            // Create MQTT client connector instance
             this.mqttClient = new MqttClientConnector();
         }
 
@@ -87,7 +88,11 @@ public class DeviceDataManager implements IDataMessageListener {
         if (this.mqttClient != null) {
             if (this.mqttClient.connectClient()) {
                 _Logger.info("Successfully connected MQTT client to broker.");
-                int qos = ConfigConst.DEFAULT_QOS; // Default QoS
+
+                // Get QoS level from configuration (add this if not defined yet)
+                int qos = ConfigConst.DEFAULT_QOS;
+
+                // Subscribe to MQTT topics
                 this.mqttClient.subscribeToTopic(ResourceNameEnum.GDA_MGMT_STATUS_MSG_RESOURCE, qos);
                 this.mqttClient.subscribeToTopic(ResourceNameEnum.CDA_ACTUATOR_RESPONSE_RESOURCE, qos);
                 this.mqttClient.subscribeToTopic(ResourceNameEnum.CDA_SENSOR_MSG_RESOURCE, qos);
@@ -125,6 +130,7 @@ public class DeviceDataManager implements IDataMessageListener {
             this.mqttClient.unsubscribeFromTopic(ResourceNameEnum.CDA_SENSOR_MSG_RESOURCE);
             this.mqttClient.unsubscribeFromTopic(ResourceNameEnum.CDA_SYSTEM_PERF_MSG_RESOURCE);
 
+            // Disconnect MQTT client
             if (this.mqttClient.disconnectClient()) {
                 _Logger.info("Successfully disconnected MQTT client from broker.");
             } else {
