@@ -32,11 +32,11 @@ import programmingtheiot.gda.connection.*;
  * environment.
  *
  */
-public class MqttClientConnectorTest
+public class MqttClientControlPacketTest
 {
 	// static
 	private static final Logger _Logger =
-		Logger.getLogger(MqttClientConnectorTest.class.getName());
+		Logger.getLogger(MqttClientControlPacketTest.class.getName());
 
 	// member var's
 	// TODO: make sure MqttClientConnector is configured to
