@@ -31,12 +31,12 @@ public class DeviceDataManager implements IDataMessageListener
 	private static final Logger _Logger =
 		Logger.getLogger(DeviceDataManager.class.getName());
 	// private var's
-	private boolean enableMqttClient = true;
+	private boolean enableMqttClient = false;
 	private boolean enableCoapServer = true;
-	private boolean enableCloudClient = false;
+	private boolean enableCloudClient = true;
 	private boolean enableSmtpClient = false;
 	private boolean enablePersistenceClient = false;
-	private boolean enableSystemPerf = false;
+	private boolean enableSystemPerf = true;
  
 	private IActuatorDataListener actuatorDataListener = null;
 	private IPubSubClient mqttClient = null;
