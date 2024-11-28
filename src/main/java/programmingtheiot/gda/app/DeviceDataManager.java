@@ -1,5 +1,7 @@
 package programmingtheiot.gda.app;
 
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
  
@@ -10,6 +12,7 @@ import programmingtheiot.common.IDataMessageListener;
 import programmingtheiot.common.ResourceNameEnum;
  
 import programmingtheiot.data.ActuatorData;
+import programmingtheiot.data.BaseIotData;
 import programmingtheiot.data.DataUtil;
 import programmingtheiot.data.SensorData;
 import programmingtheiot.data.SystemPerformanceData;
@@ -68,6 +71,21 @@ public class DeviceDataManager implements IDataMessageListener
 	this.enablePersistenceClient =
 		configUtil.getBoolean(
 			ConfigConst.GATEWAY_DEVICE, ConfigConst.ENABLE_PERSISTENCE_CLIENT_KEY);
+	this.handleHumidityChangeOnDevice =
+		    configUtil.getBoolean(ConfigConst.GATEWAY_DEVICE, "handleHumidityChangeOnDevice");
+
+		this.humidityMaxTimePastThreshold =
+		    configUtil.getInteger(ConfigConst.GATEWAY_DEVICE, "humidityMaxTimePastThreshold");
+
+		this.nominalHumiditySetting =
+		    configUtil.getFloat(ConfigConst.GATEWAY_DEVICE, "nominalHumiditySetting");
+
+		this.triggerHumidifierFloor =
+		    configUtil.getFloat(ConfigConst.GATEWAY_DEVICE, "triggerHumidifierFloor");
+
+		this.triggerHumidifierCeiling =
+		    configUtil.getFloat(ConfigConst.GATEWAY_DEVICE, "triggerHumidifierCeiling");
+
 	initManager();
 	}
  
@@ -110,7 +128,19 @@ public DeviceDataManager(
 	 	super();
 	 	initManager();
 	 }
+private ActuatorData   latestHumidifierActuatorData = null;
+private ActuatorData   latestHumidifierActuatorResponse = null;
+private ActuatorData     latestHumiditySensorData = null;
+private OffsetDateTime latestHumiditySensorTimeStamp = null;
 
+private boolean handleHumidityChangeOnDevice = false; // optional
+private int     lastKnownHumidifierCommand   = ConfigConst.OFF_COMMAND;
+
+// TODO: Load these from PiotConfig.props
+private long    humidityMaxTimePastThreshold = 300; // seconds
+private float   nominalHumiditySetting   = 40.0f;
+private float   triggerHumidifierFloor   = 30.0f;
+private float   triggerHumidifierCeiling = 50.0f;
 	// public methods
 	 /**
      * Handles the response from an actuator command.
@@ -144,7 +174,49 @@ private void handleIncomingDataAnalysis(ResourceNameEnum resource, ActuatorData 
 				this.actuatorDataListener.onActuatorDataUpdate(data);
 			}
 		}
+		if (data.getTypeID() == ConfigConst.HUMIDITY_SENSOR_TYPE) {
+	        handleHumiditySensorAnalysis(resource, data);
+	    }
 	}
+private void handleHumiditySensorAnalysis(ResourceNameEnum resource, ActuatorData actuatorData2) {
+    _Logger.fine("Analyzing humidity data: " + actuatorData2.getValue());
+
+    boolean isLow = actuatorData2.getValue() < this.triggerHumidifierFloor;
+    boolean isHigh = actuatorData2.getValue() > this.triggerHumidifierCeiling;
+
+    if (isLow || isHigh) {
+        if (this.latestHumiditySensorData == null) {
+            this.latestHumiditySensorData = actuatorData2;
+            this.latestHumiditySensorTimeStamp = OffsetDateTime.now();
+            return;
+        }
+
+        long timeElapsed = ChronoUnit.SECONDS.between(
+            this.latestHumiditySensorTimeStamp, OffsetDateTime.now());
+
+        if (timeElapsed >= this.humidityMaxTimePastThreshold) {
+            int command = isLow ? ConfigConst.ON_COMMAND : ConfigConst.OFF_COMMAND;
+
+            ActuatorData actuatorData = new ActuatorData();
+            actuatorData.setName(ConfigConst.HUMIDIFIER_ACTUATOR_NAME);
+            actuatorData.setCommand(command);
+            actuatorData.setValue(this.nominalHumiditySetting);
+
+            sendActuatorCommandtoCda(resource, actuatorData);
+
+            this.latestHumidifierActuatorData = actuatorData;
+            this.latestHumiditySensorData = null; // Reset after actuation
+        }
+    }
+}
+private void sendActuatorCommandtoCda(ResourceNameEnum resource, ActuatorData data) {
+    if (this.mqttClient != null) {
+        String jsonData = DataUtil.getInstance().actuatorDataToJson(data);
+        this.mqttClient.publishMessage(resource.getResourceName(), jsonData, ConfigConst.DEFAULT_QOS);
+        _Logger.info("Published ActuatorData: " + data.getCommand());
+    }
+}
+
 	/**
      * Handles a request for an actuator command.
      *
@@ -173,6 +245,28 @@ private void handleIncomingDataAnalysis(ResourceNameEnum resource, ActuatorData 
 		} else {
 			return false;
 		}
+	}
+	private void handleUpstreamTransmission(ResourceNameEnum resource, String jsonData, int qos)
+	{
+		// NOTE: This will be implemented in Part 04
+		_Logger.info("TODO: Send JSON data to cloud service: " + resource);
+	}
+	private OffsetDateTime getDateTimeFromData(BaseIotData data)
+	{
+		OffsetDateTime odt = null;
+		
+		try {
+			odt = OffsetDateTime.parse(data.getTimeStamp());
+		} catch (Exception e) {
+			_Logger.warning(
+				"Failed to extract ISO 8601 timestamp from IoT data. Using local current time.");
+			
+			// TODO: this won't be accurate, but should be reasonably close, as the CDA will
+			// most likely have recently sent the data to the GDA
+			odt = OffsetDateTime.now();
+		}
+		
+		return odt;
 	}
 	 /**
      * Handles a sensor message.
@@ -268,6 +362,26 @@ private void handleIncomingDataAnalysis(ResourceNameEnum resource, ActuatorData 
 	if (this.sysPerfMgr != null) {
 		this.sysPerfMgr.startManager();
 	}
+	if (this.mqttClient != null) {
+        if (this.mqttClient.connectClient()) {
+            _Logger.info("Successfully connected MQTT client to broker.");
+            // Subscriptions now handled in MqttClientConnector's connectComplete()
+        } else {
+            _Logger.severe("Failed to connect MQTT client to broker.");
+        }
+    }
+
+    if (this.enableCoapServer && this.coapServer != null) {
+        if (this.coapServer.startServer()) {
+            _Logger.info("CoAP server started.");
+        } else {
+            _Logger.severe("Failed to start CoAP server. Check log file for details.");
+        }
+    }
+
+    if (this.sysPerfMgr != null) {
+        this.sysPerfMgr.startManager();
+    }
 }
 
 	 /**
@@ -315,5 +429,6 @@ private void handleIncomingDataAnalysis(ResourceNameEnum resource, ActuatorData 
 	 * instances that will be used in the {@link #startManager() and #stopManager()) methods.
 	 * 
 	 */
+
 
 }
